@@ -14,6 +14,8 @@ credentials = {
     'client_id': '<client ID>',
     'client_secret': '<client secret key>',
     'grant_type': 'client_credentials',
+    'token_uri': 'https://app.mergado.com/oauth2/token/',  # optional
+    'api_uri': 'https://app.mergado.com/api/',  # optional
 }
 
 # Build API client instance.

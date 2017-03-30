@@ -17,15 +17,18 @@ def build(credentials, api_version='0.3'):
 
 class BaseClient(object):
 
-    def __init__(self, client_id, client_secret, grant_type=None):
+    def __init__(self, client_id, client_secret, grant_type=None,
+                 token_uri=config.TOKEN_URI, api_uri=config.MERGADO_API_URI):
+
         self.client_id = client_id
         self.client_secret = client_secret
         self.grant_type = grant_type
 
         self.access_token = None
         self.token_expiry = None
-        self.token_uri = config.TOKEN_URI
+        self.token_uri = token_uri
         self.token_entity_id = None
+        self.api_uri = api_uri
 
     @property
     def token_is_valid(self):
@@ -40,7 +43,7 @@ class BaseClient(object):
     def get_url(self, path):
         if path.startswith('/'):
             path = path[1:]
-        return urljoin(config.MERGADO_API_URI, path)
+        return urljoin(self.api_uri, path)
 
     def get_token_data(self):
         raise NotImplementedError()
