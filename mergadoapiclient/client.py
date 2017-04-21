@@ -83,6 +83,21 @@ class BaseClient(object):
     def delete(self, path, **options):
         return self.request('DELETE', path, **options)
 
+    def iter(self, path, limit=100, offset=0, **options):
+        while True:
+            params = {'offset': offset, 'limit': limit}
+            response = self.get(path, params=params, **options)
+            data = response.get('data')
+
+            if not data:
+                break
+            for item in data:
+                yield item
+
+            if len(data) < limit:
+                break
+            offset += limit
+
 
 class ClientCredentialsClient(BaseClient):
 
