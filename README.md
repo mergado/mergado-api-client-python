@@ -22,9 +22,6 @@ credentials = {
 # Build API client instance.
 api = client.build(credentials)
 
-# Request Access Token.
-api.request_token()
-
 # Get an Eshop with ID = 1.
 api.get('shops/1')
 ```
