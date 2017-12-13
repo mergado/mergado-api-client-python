@@ -15,7 +15,7 @@ credentials = {
     'client_secret': '<client secret key>',
     'grant_type': 'client_credentials',
     'token_uri': 'https://app.mergado.com/oauth2/token/',  # optional
-    'api_uri': 'https://app.mergado.com/api/',  # optional
+    'api_uri': 'https://api.mergado.com/',  # optional
     'storage_class': 'yourapp.models.TokenStorage',  # optional
 }
 
