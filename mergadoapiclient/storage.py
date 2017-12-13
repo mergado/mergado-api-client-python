@@ -30,4 +30,3 @@ class BaseTokenStorage(object):
         """
         if self.token and self.token_is_valid:
             return self
-
