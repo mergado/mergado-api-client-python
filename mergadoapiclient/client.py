@@ -2,7 +2,7 @@
 
 
 import importlib
-from datetime import datetime, timedelta
+
 try:
     from urlparse import urljoin
 except ImportError:
@@ -59,9 +59,8 @@ class BaseClient(object):
 
         self.storage = self.TokenStorage.init(
             token=resp_data['access_token'],
-            expires_at=(datetime.now() +
-                        timedelta(seconds=resp_data['expires_in'])),
-        )
+            expires_in=resp_data['expires_in'])
+
         self.storage.save()
         return self.storage.token
 
