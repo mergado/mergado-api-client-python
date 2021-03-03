@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class BaseTokenStorage(object):
     """Token storage representation."""
 
     @classmethod
-    def init(cls, token=None, expires_at=None):
+    def init(cls, token=None, expires_in=None):
         # dedicated init because if django ORM is used, overriding
         # __init__ may prevent the model instance from being saved.
         # see https://docs.djangoproject.com/en/1.8/ref/models/instances/
         self = cls()
         self.token = token
-        self.expires_at = expires_at
+        self.expires_at = datetime.now() + timedelta(seconds=expires_in)
         return self
 
     @property
