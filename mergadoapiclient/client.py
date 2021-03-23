@@ -2,6 +2,7 @@
 
 
 import importlib
+import time
 
 try:
     from urlparse import urljoin
@@ -25,11 +26,23 @@ def build(credentials, api_version='0.3'):
         NotImplementedError('Grant type not implemented.')
 
 
+def retry_request(make_request, retry_status_list, tries):
+    for i in range(tries):
+        response = make_request()
+        if response.status_code not in retry_status_list:
+            break
+        wait = 2 ** i
+        time.sleep(wait)
+    response.raise_for_status()
+    return response
+
+
 class BaseClient(object):
 
     def __init__(self, client_id, client_secret,
                  grant_type=None, storage_class=config.TOKEN_STORAGE_CLASS,
-                 token_uri=config.TOKEN_URI, api_uri=config.MERGADO_API_URI):
+                 token_uri=config.TOKEN_URI, api_uri=config.MERGADO_API_URI,
+                 retry_status_list=(500, 502, 503, 504), tries=3):
 
         self.client_id = client_id
         self.client_secret = client_secret
@@ -39,6 +52,8 @@ class BaseClient(object):
         self.storage = self.TokenStorage()
         self.token_uri = token_uri
         self.api_uri = api_uri
+        self.retry_status_list = retry_status_list
+        self.tries = tries
 
     @property
     def _token_headers(self):
@@ -70,9 +85,13 @@ class BaseClient(object):
         return urljoin(self.api_uri, path)
 
     def request(self, method, path, **options):
-        response = http.request(method, self.get_url(path),
-                                headers=self._token_headers, **options)
-        response.raise_for_status()
+        def make_request():
+            return http.request(
+                method, self.get_url(path),
+                headers=self._token_headers, **options)
+
+        response = retry_request(
+            make_request, self.retry_status_list, self.tries)
         return response.json()
 
     def get(self, path, **options):
