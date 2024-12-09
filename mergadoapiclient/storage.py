@@ -28,5 +28,8 @@ class BaseTokenStorage(object):
         """Loads storage instance. Default implementation stores the
         token in memory and does nothing else.
         """
+        if not hasattr(self, 'token'):
+            return
+
         if self.token and self.token_is_valid:
             return self
