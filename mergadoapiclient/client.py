@@ -42,11 +42,12 @@ class BaseClient(object):
     def __init__(self, client_id, client_secret,
                  grant_type=None, storage_class=config.TOKEN_STORAGE_CLASS,
                  token_uri=config.TOKEN_URI, api_uri=config.MERGADO_API_URI,
-                 retry_status_list=(500, 502, 503, 504), tries=3):
+                 retry_status_list=(500, 502, 503, 504), tries=3, headers=None):
 
         self.client_id = client_id
         self.client_secret = client_secret
         self.grant_type = grant_type
+        self.headers = headers or {}
 
         self.TokenStorage = _class_from_string(storage_class)
         self.storage = self.TokenStorage()
@@ -84,11 +85,18 @@ class BaseClient(object):
             path = path[1:]
         return urljoin(self.api_uri, path)
 
+    def get_headers(self):
+        headers = {
+            **self._token_headers,
+            **self.headers
+        }
+        return headers
+
     def request(self, method, path, **options):
         def make_request():
             return http.request(
                 method, self.get_url(path),
-                headers=self._token_headers, **options)
+                headers=self.get_headers(), **options)
 
         response = retry_request(
             make_request, self.retry_status_list, self.tries)
